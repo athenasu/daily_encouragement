@@ -67,4 +67,4 @@ This project started off from feeling down and wanted something cheerful. I've b
 1. ~~Use SAM to automate CloudFormation & deployment~~
 2. Automate SNS subsciption for emails
 3. Configure cron job for EventBridge
-4. Create Frontend for easier use
+4. Create Frontend to be able to select what type of daily emails to get and set up time

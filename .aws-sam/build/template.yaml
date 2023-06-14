@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'daily_encouragement
+
+  SAM Template for daily_encouragement
+
+  '
+Globals:
+  Function:
+    Timeout: 15
+    MemorySize: 128
+Mappings:
+  common:
+    us-west-2:
+      arnlayeropenai: arn:aws:lambda:us-west-2:783907683109:layer:openai_python_layer:1
+Resources:
+  DailyEncouragementFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: DailyEncouragementFunction
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Layers:
+      - Fn::FindInMap:
+        - common
+        - Ref: AWS::Region
+        - arnlayeropenai
+      Architectures:
+      - x86_64
+      Events:
+        DailyEncouragementEvent:
+          Type: SNS
+          Properties:
+            Topic:
+              Ref: DailyEncouragementSNSTopic
+        DailyEncouragementApi:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+    Metadata:
+      SamResourceId: DailyEncouragementFunction
+  DailyEncouragementSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: DailyEncouragementSNSTopic
+      DisplayName: daily-encouragement-sns-topic
+  LambdaSNSPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Fn::GetAtt:
+        - DailyEncouragementFunction
+        - Arn
+      Action: lambda:InvokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn:
+        Ref: DailyEncouragementSNSTopic
+  ApplicationResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name:
+        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
+      ResourceQuery:
+        Type: CLOUDFORMATION_STACK_1_0
+  ApplicationInsightsMonitoring:
+    Type: AWS::ApplicationInsights::Application
+    Properties:
+      ResourceGroupName:
+        Ref: ApplicationResourceGroup
+      AutoConfigurationEnabled: true
+Outputs:
+  HelloWorldApi:
+    Description: API Gateway endpoint URL for Prod stage for Hello World function
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/
+  DailyEncouragementFunction:
+    Description: DailyEncouragementFunction Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - DailyEncouragementFunction
+      - Arn
+  DailyEncouragementFunctionIamRole:
+    Description: Implicit IAM Role created for DailyEncouragementFunction function
+    Value:
+      Fn::GetAtt:
+      - DailyEncouragementFunctionRole
+      - Arn

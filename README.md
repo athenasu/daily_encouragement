@@ -32,11 +32,7 @@ This project started off from feeling down and wanting to have something cheerfu
 1. Create Lambda function
 2. Download OpenAI for lambda layer
    - Download at https://github.com/erenyasarkurt/OpenAI-AWS-Lambda-Layer?tab=readme-ov-file
-   - cd to Downloads folder
-   - Make new folder `mkdir python`
-   - Install OpenAI locally `pip install openai -t .`
-   - Go to outer folder `cd ..`
-   - Create zip file for lambda layer `zip -r openai-lambda-package.zip python`
+   - Will use the file: `OpenAI-AWS-Lambda-Layer-main/releases/openai-aws-lambda-layer-3.9` for the Lambda layer
 3. Create SNS Topic and subscribe using email
    1. On right hand side click on 'Topics'
    2. Select Standard SNS, and then click 'Create Topic'
@@ -98,7 +94,7 @@ This project started off from feeling down and wanting to have something cheerfu
           
           # Send the message to SNS
           sns_response = sns.publish(
-              TopicArn=os.environ['TOPIC_ARN'],
+              TopicArn=SNS_TOPIC_ARN,
               Message=message,
               MessageStructure='string'
           )
